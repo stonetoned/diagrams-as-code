@@ -6,7 +6,7 @@
 
 ## 🌐 Custom Domain (Optional)
 
-Want `https://dgrac.example.com` instead of `https://nosahama.github.io/diagrams-as-code`?
+Want `https://dgrac.example.com` instead of `https://stonetoned.github.io/diagrams-as-code`?
 
 1. **Buy a domain** (GoDaddy, Namecheap, etc.)
 2. **Go to repo Settings → Pages**
@@ -72,7 +72,7 @@ ls -la docs/
 ## 📊 Your dgrac Setup Breakdown
 
 ```
-nosahama/dgrac (your repository)
+stonetoned/diagrams-as-code (your repository)
 │
 ├── docs/ ← GitHub Pages source
 │   ├── _config.yml      ← Jekyll config (theme, title)
@@ -86,7 +86,7 @@ nosahama/dgrac (your repository)
 ```
 
 ### Result:
-- 🌐 **Website URL:** `https://nosahama.github.io/diagrams-as-code`
+- 🌐 **Website URL:** `https://stonetoned.github.io/diagrams-as-code`
 - 📄 **Homepage from:** `docs/index.md`
 - 🎨 **Theme from:** `docs/_config.yml`
 - ✅ **Status:** Live and auto-updating
@@ -100,10 +100,10 @@ nosahama/dgrac (your repository)
 Create new Markdown files:
 ```
 docs/
-├── index.md           → https://nosahama.github.io/diagrams-as-code/
-├── installation.md    → https://nosahama.github.io/diagrams-as-code/installation.html
+├── index.md           → https://stonetoned.github.io/diagrams-as-code/
+├── installation.md    → https://stonetoned.github.io/diagrams-as-code/installation.html
 ├── examples/
-│   └── python.md      → https://nosahama.github.io/diagrams-as-code/examples/python.html
+│   └── python.md      → https://stonetoned.github.io/diagrams-as-code/examples/python.html
 ```
 
 ### Add navigation menu:
