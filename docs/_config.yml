@@ -12,5 +12,4 @@ plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
 exclude:
-  - GITHUB_PAGES_GUIDE.md
   - _site
