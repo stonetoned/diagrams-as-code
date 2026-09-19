@@ -12,6 +12,9 @@
   --line: #2b3d5e;
   --cyan: #38bdf8;
   --violet: #a78bfa;
+  --code-bg: #07101f;
+  --code-fg: #e6edf3;
+  --code-border: #344967;
 }
 
 body {
@@ -22,11 +25,105 @@ body {
 a { color: var(--cyan); }
 a:hover { color: #7dd3fc; }
 h1, h2, h3, strong { color: #f8fafc; }
-code { color: #d8b4fe; background: #111b30; }
-pre { background: #0b1424; border: 1px solid var(--line); }
-pre code { color: #dbeafe; background: transparent; }
+code {
+  padding: .12em .32em;
+  border-radius: 4px;
+  color: #e9d5ff;
+  background: #111b30;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: .92em;
+}
+
+pre,
+.highlight,
+.highlighter-rouge .highlight {
+  color: var(--code-fg);
+  background: var(--code-bg);
+}
+
+pre {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--code-border);
+  border-radius: 9px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+  line-height: 1.65;
+}
+
+pre code,
+.highlight pre,
+pre.highlight {
+  padding: 0;
+  color: var(--code-fg);
+  background: transparent;
+  font-size: .9rem;
+}
+
+/* Accessible dark syntax palette for Jekyll/Rouge output. */
+.highlight .c,
+.highlight .c1,
+.highlight .cm,
+.highlight .cp,
+.highlight .cs,
+.highlight .cd { color: #9fb0c3; }
+.highlight .k,
+.highlight .kc,
+.highlight .kd,
+.highlight .kn,
+.highlight .kp,
+.highlight .kr,
+.highlight .kt,
+.highlight .kv,
+.highlight .o,
+.highlight .ow { color: #ff9f9a; }
+.highlight .s,
+.highlight .s1,
+.highlight .s2,
+.highlight .sb,
+.highlight .sc,
+.highlight .sd,
+.highlight .se,
+.highlight .sh,
+.highlight .si,
+.highlight .sr,
+.highlight .ss,
+.highlight .sx { color: #a5d6ff; }
+.highlight .m,
+.highlight .mb,
+.highlight .mf,
+.highlight .mh,
+.highlight .mi,
+.highlight .mo,
+.highlight .mx,
+.highlight .il { color: #79c0ff; }
+.highlight .na,
+.highlight .nb,
+.highlight .bp,
+.highlight .nc,
+.highlight .nd,
+.highlight .ne,
+.highlight .nf,
+.highlight .ni,
+.highlight .nl,
+.highlight .nn,
+.highlight .no,
+.highlight .nt { color: #7ee787; }
+.highlight .nv,
+.highlight .vc,
+.highlight .vg,
+.highlight .vi { color: #d2a8ff; }
+.highlight .err,
+.highlight .gr,
+.highlight .gt { color: #ffa198; background: transparent; }
+.highlight .gd { color: #ffa198; background: rgba(248, 81, 73, .15); }
+.highlight .gi { color: #7ee787; background: rgba(46, 160, 67, .15); }
+.highlight .gh,
+.highlight .gu { color: #79c0ff; font-weight: 700; }
+.highlight .go,
+.highlight .gp,
+.highlight .w { color: #b7c5d6; }
 table { width: 100%; }
 th, td { border-color: var(--line); }
+th { color: #cbd5e1; }
 blockquote { border-left-color: var(--violet); color: var(--muted); }
 
 header img { max-width: 56px; border-radius: 12px; }
