@@ -8,80 +8,91 @@ ext="${3:-}"
 ROOT="${ROOT:-${DIAGRAMS_ROOT:-/diagrams}}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-${DGRAC_OUTPUT_ROOT:-/output}}"
 PLANTUML_JAR="${PLANTUML_JAR:-/jars/plantuml.jar}"
+KROKI_URL="${KROKI_URL:-https://kroki.io}"
 
-if [ -z "$engine" ] || [ -z "$name" ]; then
+[ -n "$engine" ] && [ -n "$name" ] || {
   echo "usage: render_one.sh <engine> <name> [ext]" >&2
   exit 2
-fi
+}
+
+require_file() {
+  [ -f "$1" ] || {
+    echo "source file not found: $1" >&2
+    exit 1
+  }
+}
 
 render_python() {
+  input="$ROOT/py/$name.py"
   outdir="$OUTPUT_ROOT/py/$name"
+  require_file "$input"
   mkdir -p "$outdir"
-  (cd "$outdir" && python3 "$ROOT/py/$name.py")
+  (cd "$outdir" && python3 "$input")
+  [ -s "$outdir/$name.png" ] || {
+    echo "renderer did not create $outdir/$name.png" >&2
+    exit 1
+  }
 }
 
 render_plantuml() {
+  input="$ROOT/uml/$name.$ext"
+  output="$OUTPUT_ROOT/uml/$name.png"
+  temporary="$output.tmp"
+  require_file "$input"
   mkdir -p "$OUTPUT_ROOT/uml"
-  cat "$ROOT/uml/$name.$ext" | java -jar "$PLANTUML_JAR" -tpng -pipe > "$OUTPUT_ROOT/uml/$name.png"
+  trap 'rm -f "$temporary"' EXIT INT TERM
+  java -jar "$PLANTUML_JAR" -tpng -pipe < "$input" > "$temporary"
+  [ -s "$temporary" ] || { echo "PlantUML created an empty output" >&2; exit 1; }
+  mv "$temporary" "$output"
+  trap - EXIT INT TERM
 }
 
 render_mermaid() {
+  input="$ROOT/mermaid/$name.$ext"
+  output="$OUTPUT_ROOT/mermaid/$name.png"
+  temporary="$output.tmp"
+  require_file "$input"
   mkdir -p "$OUTPUT_ROOT/mermaid"
-  curl -fsSL \
+  trap 'rm -f "$temporary"' EXIT INT TERM
+  curl -fsS --retry 3 --retry-all-errors --connect-timeout 10 --max-time 90 \
+    -A "dgrac/${DGRAC_VERSION:-dev}" \
     -H 'Content-Type: text/plain' \
-    --data-binary @"$ROOT/mermaid/$name.mmd" \
-    https://kroki.io/mermaid/png \
-    -o "$OUTPUT_ROOT/mermaid/$name.png"
+    --data-binary @"$input" \
+    "${KROKI_URL%/}/mermaid/png" \
+    -o "$temporary"
+  [ -s "$temporary" ] || { echo "Kroki created an empty output" >&2; exit 1; }
+  mv "$temporary" "$output"
+  trap - EXIT INT TERM
 }
 
 render_dot() {
+  input="$ROOT/dot/$name.$ext"
+  output="$OUTPUT_ROOT/dot/$name.png"
+  require_file "$input"
   mkdir -p "$OUTPUT_ROOT/dot"
-  dot -Tpng "$ROOT/dot/$name.$ext" -o "$OUTPUT_ROOT/dot/$name.png"
+  dot -Tpng "$input" -o "$output"
+  [ -s "$output" ] || { echo "Graphviz created an empty output" >&2; exit 1; }
 }
 
 render_d2() {
-  mkdir -p "$OUTPUT_ROOT/d2"
+  input="$ROOT/d2/$name.$ext"
   svg_file="$OUTPUT_ROOT/d2/$name.svg"
   png_file="$OUTPUT_ROOT/d2/$name.png"
-  browser_bin="$(command -v chromium-browser || command -v chromium || true)"
-  if [ -z "$browser_bin" ]; then
-    echo "chromium not found in container" >&2
+  require_file "$input"
+  mkdir -p "$OUTPUT_ROOT/d2"
+  d2 "$input" "$svg_file"
+  rsvg-convert --keep-aspect-ratio --width 1800 -o "$png_file" "$svg_file"
+  [ -s "$svg_file" ] && [ -s "$png_file" ] || {
+    echo "D2 created an empty output" >&2
     exit 1
-  fi
-  d2 "$ROOT/d2/$name.$ext" "$svg_file"
-  "$browser_bin" \
-    --headless \
-    --disable-gpu \
-    --no-sandbox \
-    --hide-scrollbars \
-    --force-device-scale-factor=1 \
-    --window-size=1800,1200 \
-    --screenshot="$png_file" \
-    "file://$svg_file" >/dev/null 2>&1
+  }
 }
 
 case "$engine" in
-  py)
-    render_python
-    ;;
-  puml|uml)
-    ext="${ext:-puml}"
-    render_plantuml
-    ;;
-  mermaid)
-    ext="${ext:-mmd}"
-    render_mermaid
-    ;;
-  dot)
-    ext="${ext:-dot}"
-    render_dot
-    ;;
-  d2)
-    ext="${ext:-d2}"
-    render_d2
-    ;;
-  *)
-    echo "unknown engine: $engine" >&2
-    exit 2
-    ;;
+  py) render_python ;;
+  puml|uml) ext="${ext:-puml}"; render_plantuml ;;
+  mermaid) ext="${ext:-mmd}"; render_mermaid ;;
+  dot) ext="${ext:-dot}"; render_dot ;;
+  d2) ext="${ext:-d2}"; render_d2 ;;
+  *) echo "unknown engine: $engine" >&2; exit 2 ;;
 esac

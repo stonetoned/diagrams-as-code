@@ -1,94 +1,67 @@
 ---
 layout: default
-title: "dgrac - Diagrams as Code"
+title: "dgrac — Diagrams as Code"
+description: "Render architecture diagrams with Python diagrams, PlantUML, Mermaid, Graphviz, and D2 through one tested CLI."
+image: /assets/dgrac-social-card.png
 ---
 
-# dgrac - Diagrams as Code
+<img class="hero-card" src="{{ '/assets/dgrac-social-card.png' | relative_url }}" alt="dgrac — five diagram languages converging into a rendered architecture diagram" />
 
 <div class="page-actions">
-  <a href="{{ site.baseurl }}/gallery.html" class="btn btn-primary">📚 View Gallery</a>
-  <a href="{{ site.baseurl }}/" class="btn btn-secondary">🏠 Home</a>
+  <a href="https://github.com/stonetoned/diagrams-as-code" class="button primary">View on GitHub</a>
+  <a href="{{ '/gallery.html' | relative_url }}" class="button">Explore examples</a>
+  <a href="{{ '/cli.html' | relative_url }}" class="button">CLI reference</a>
 </div>
 
----
+## One workflow, five engines
 
-## Sample Output Snapshots
+`dgrac` renders Python diagrams, PlantUML, Mermaid, Graphviz DOT, and D2 without making you maintain five local toolchains. It is designed for architecture-as-code, cloud diagrams, C4 models, UML, sequence diagrams, ER models, state machines, and CI-generated technical documentation.
 
-<div class="sample-output-grid">
-  <a href="{{ site.baseurl }}/assets/examples/py/easy.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/py/easy.png" alt="Python easy output" />
-  </a>
-  <a href="{{ site.baseurl }}/assets/examples/uml/easy.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/uml/easy.png" alt="PlantUML easy output" />
-  </a>
-  <a href="{{ site.baseurl }}/assets/examples/mermaid/medium.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/mermaid/medium.png" alt="Mermaid medium output" />
-  </a>
-  <a href="{{ site.baseurl }}/assets/examples/dot/medium.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/dot/medium.png" alt="Graphviz medium output" />
-  </a>
-  <a href="{{ site.baseurl }}/assets/examples/py/complex.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/py/complex.png" alt="Python complex output" />
-  </a>
-  <a href="{{ site.baseurl }}/assets/examples/d2/complex.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/d2/complex.png" alt="D2 complex output" />
-  </a>
-</div>
-
-Welcome to **dgrac**, the all-in-one diagram-as-code playground with zero setup complexity.
-
-## What is dgrac?
-
-`dgrac` brings together **5 professional diagram engines** in a single Docker container with one Makefile. No npm, no pip, no dependency hell—just run `make` and get beautiful diagrams.
-
-### Supported Engines
-
-- **Python diagrams** — Cloud architecture & infrastructure
-- **PlantUML** — UML, sequences, components, C4 models
-- **Mermaid** — Modern flowcharts, architecture, state diagrams
-- **Graphviz DOT** — Precise control, dependency graphs
-- **D2** — Modern syntax with strong styling
-
-## Why dgrac?
-
-### Problem
-Diagram-as-code tools are powerful but scattered:
-- Each engine requires different setup
-- Dependencies vary widely
-- No single workflow for learning or comparing them
-- Hard to integrate into CI/CD pipelines
-
-### Solution
-**One container. One Makefile. All engines ready.**
-
-```bash
-make run-container
-make render-all
-# Done! All 5 engines rendered and ready in ./output
-```
-
-## Key Features
-
-✨ **Zero Setup** — Everything containerized, works on any system with Docker
-🎯 **Engine Comparison** — Learn and compare all 5 engines side-by-side
-🚀 **CI/CD Ready** — Perfect for automated documentation pipelines
-📚 **Well Documented** — Curated examples for easy, medium, and complex diagrams
-🔧 **Simple Commands** — Intuitive `make` targets, no cryptic CLI flags
-
-## Quick Start
-
-### 1. Clone & Enter Directory
 ```bash
 git clone https://github.com/stonetoned/diagrams-as-code.git
-cd dgrac
+cd diagrams-as-code
+./dgrac doctor
+./dgrac render --engine mermaid --name architecture
 ```
 
-### 2. Start Container
+<div class="feature-grid">
+  <div><strong>Reproducible</strong><br />Pinned, checksum-verified renderers in one Docker image.</div>
+  <div><strong>Lean</strong><br />No bundled browser. D2 SVG becomes PNG with librsvg.</div>
+  <div><strong>Safe defaults</strong><br />Read-only source mounts and offline rendering where possible.</div>
+  <div><strong>Automation-ready</strong><br />CLI, Make shortcuts, JSON discovery, and a GitHub Action.</div>
+  <div><strong>Agent-friendly</strong><br />llms.txt, full retrieval context, and verified agent instructions.</div>
+  <div><strong>Useful examples</strong><br />Architecture, C4, deployment, sequence, ER, state, and dependency designs.</div>
+</div>
+
+## Choose the right renderer
+
+| Need | Recommended engine |
+|---|---|
+| Cloud-provider and infrastructure icons | Python diagrams |
+| UML, C4, component, deployment | PlantUML |
+| Markdown-friendly flowchart, ER, state, sequence | Mermaid |
+| Dependency graphs and layout control | Graphviz DOT |
+| Modern architecture styling and SVG | D2 |
+
+## Render and verify everything
+
 ```bash
-make run-container
+./dgrac list --json
+./dgrac render-all
+./dgrac test
 ```
 
-### 3. Verify Setup
-```bash
-make doctor
+Mermaid uses a Kroki endpoint. Set `DGRAC_KROKI_URL` to your self-hosted Kroki instance when diagrams are confidential. Every other bundled engine renders with container networking disabled.
+
+## Use it in CI
+
+```yaml
+- uses: actions/checkout@v7
+- uses: stonetoned/diagrams-as-code@v0
+  with:
+    command: test
+    source: diagrams
+    output: output
 ```
+
+[Read the complete README](https://github.com/stonetoned/diagrams-as-code#readme) or start with the [CLI reference]({{ '/cli.html' | relative_url }}).

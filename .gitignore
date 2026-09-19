@@ -7,3 +7,4 @@ output/
 # Ignore generated site artifacts
 docs/_site/
 docs/_site-gh/
+docs/.jekyll-cache/

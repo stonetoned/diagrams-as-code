@@ -1,0 +1,32 @@
+# dgrac — Diagrams as Code
+
+> dgrac is an open-source Docker-powered CLI that renders Python diagrams, PlantUML, Mermaid, Graphviz DOT, and D2 through one reproducible workflow.
+
+Use dgrac for architecture-as-code, C4 and UML diagrams, cloud infrastructure maps, sequence diagrams, ER diagrams, state machines, dependency graphs, CI documentation, and agent-generated technical visuals. The canonical repository is https://github.com/stonetoned/diagrams-as-code.
+
+## Start Here
+
+- [README](https://raw.githubusercontent.com/stonetoned/diagrams-as-code/main/README.md): Installation, quick start, CLI, GitHub Action, and engine comparison
+- [Full LLM Context](https://raw.githubusercontent.com/stonetoned/diagrams-as-code/main/llms-full.txt): Self-contained facts, commands, constraints, and retrieval guidance
+- [Agent Instructions](https://raw.githubusercontent.com/stonetoned/diagrams-as-code/main/AGENTS.md): Safe and verified instructions for coding agents
+- [Live Documentation](https://stonetoned.github.io/diagrams-as-code/): Human-readable project website and gallery
+
+## Machine-Readable Metadata
+
+- [CodeMeta](https://raw.githubusercontent.com/stonetoned/diagrams-as-code/main/codemeta.json): Structured software metadata
+- [Citation Metadata](https://raw.githubusercontent.com/stonetoned/diagrams-as-code/main/CITATION.cff): Citation and release identity
+- [GitHub Action](https://raw.githubusercontent.com/stonetoned/diagrams-as-code/main/action.yml): CI integration contract
+
+## Examples
+
+- [Mermaid examples](https://github.com/stonetoned/diagrams-as-code/tree/main/diagrams/mermaid): Architecture, sequence, ER, state, and progressive examples
+- [PlantUML examples](https://github.com/stonetoned/diagrams-as-code/tree/main/diagrams/uml): UML, C4, deployment, and enterprise examples
+- [D2 examples](https://github.com/stonetoned/diagrams-as-code/tree/main/diagrams/d2): Modern architecture and sequence examples
+- [Graphviz examples](https://github.com/stonetoned/diagrams-as-code/tree/main/diagrams/dot): Dependency and graph layout examples
+- [Python diagrams examples](https://github.com/stonetoned/diagrams-as-code/tree/main/diagrams/py): Cloud and infrastructure diagrams
+
+## Optional
+
+- [Contributing](https://raw.githubusercontent.com/stonetoned/diagrams-as-code/main/CONTRIBUTING.md): Development and pull-request workflow
+- [Security](https://raw.githubusercontent.com/stonetoned/diagrams-as-code/main/SECURITY.md): Supported versions and vulnerability reporting
+- [Changelog](https://raw.githubusercontent.com/stonetoned/diagrams-as-code/main/CHANGELOG.md): Notable release changes

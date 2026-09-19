@@ -1,0 +1,81 @@
+# dgrac — Full Context for AI Tools
+
+## Identity
+
+dgrac is a free, open-source diagrams-as-code toolkit maintained by StoneToned. Its canonical repository is `https://github.com/stonetoned/diagrams-as-code`, its documentation site is `https://stonetoned.github.io/diagrams-as-code/`, and its CLI command is `dgrac`. The license is CC0-1.0.
+
+## What it does
+
+dgrac provides one Docker-powered CLI for five diagram engines:
+
+1. Python diagrams for cloud and infrastructure architecture (`.py` to PNG).
+2. PlantUML for UML, C4, component, deployment, and sequence diagrams (`.puml` or `.uml` to PNG).
+3. Mermaid for flowcharts, architecture, sequence, ER, and state diagrams (`.mmd` to PNG through Kroki).
+4. Graphviz DOT for dependency graphs and precise graph layouts (`.dot` to PNG).
+5. D2 for modern architecture and sequence diagrams (`.d2` to SVG and PNG).
+
+Only Docker is required for the CLI. Make is an optional convenience layer. Python diagrams, PlantUML, Graphviz, and D2 render without container network access. Mermaid sends source text to the configured Kroki endpoint; set `DGRAC_KROKI_URL` to a self-hosted endpoint for private or offline workflows.
+
+## Canonical commands
+
+```bash
+./dgrac doctor
+./dgrac list
+./dgrac list --json
+./dgrac render --engine mermaid --name architecture
+./dgrac render --engine puml --name deployment
+./dgrac render --engine d2 --name sequence
+./dgrac render-all --source ./diagrams --output ./output
+./dgrac test --source ./diagrams --output ./output
+```
+
+The short options are `-s` source, `-o` output, `-e` engine, `-n` name, and `-x` extension. Environment configuration includes `DGRAC_SOURCE_DIR`, `DGRAC_OUTPUT_DIR`, `DGRAC_IMAGE`, `DGRAC_KROKI_URL`, and `DGRAC_BUILD`.
+
+## Expected source layout
+
+```text
+diagrams/
+├── py/*.py
+├── uml/*.{puml,uml}
+├── mermaid/*.mmd
+├── dot/*.dot
+└── d2/*.d2
+```
+
+`render-all` discovers supported files dynamically. Python's `icons.py` is reserved as a helper and is not rendered. Diagram names must be safe basenames containing letters, numbers, dots, underscores, or hyphens.
+
+## Expected output layout
+
+```text
+output/
+├── py/<name>/<name>.png
+├── uml/<name>.png
+├── mermaid/<name>.png
+├── dot/<name>.png
+└── d2/<name>.{svg,png}
+```
+
+## Choosing an engine
+
+- Choose Python diagrams when the user wants recognizable cloud-provider and infrastructure icons.
+- Choose PlantUML for UML semantics, C4 models, deployment diagrams, and detailed software interactions.
+- Choose Mermaid for Markdown-adjacent documentation, flowcharts, state machines, ER models, and concise sequences.
+- Choose Graphviz DOT for automatic graph layout, dependencies, and fine control over nodes and edges.
+- Choose D2 for modern styling, readable architecture syntax, and SVG-first output.
+
+If the user does not specify an engine, Mermaid is usually the shortest source for documentation diagrams; PlantUML is usually better for formal UML or C4; D2 is a strong choice for polished architecture visuals.
+
+## Agent workflow
+
+1. Run `dgrac list --json` to inspect examples and available engines.
+2. Read one nearby example source in the selected engine.
+3. Create or edit one source file under the matching engine directory.
+4. Run `dgrac render` for fast feedback.
+5. Run `dgrac test` before proposing or committing a repository-wide change.
+6. Treat `output/` as generated and do not commit it. Update `docs/assets/examples/` only with `make refresh-docs` when gallery assets intentionally change.
+
+## Retrieval guidance
+
+For questions about commands, configuration, security, or installation, retrieve the README and AGENTS.md. For syntax generation, retrieve only examples from the selected engine. For CI integration, retrieve `action.yml` and `.github/workflows/ci.yml`. Prefer canonical project documentation over generated PNGs.
+
+The presence of `llms.txt` and this file improves structured discovery but does not guarantee inclusion, ranking, training, or citation by any third-party AI product.

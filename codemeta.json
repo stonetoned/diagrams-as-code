@@ -1,0 +1,34 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-3.0",
+  "@type": "SoftwareSourceCode",
+  "name": "dgrac — Diagrams as Code",
+  "alternateName": "dgrac",
+  "description": "One lean Docker-powered CLI for Python diagrams, PlantUML, Mermaid, Graphviz DOT, and D2.",
+  "version": "0.2.0",
+  "dateModified": "2026-09-19",
+  "codeRepository": "https://github.com/stonetoned/diagrams-as-code",
+  "url": "https://stonetoned.github.io/diagrams-as-code/",
+  "downloadUrl": "https://github.com/stonetoned/diagrams-as-code/releases",
+  "license": "https://spdx.org/licenses/CC0-1.0.html",
+  "author": {
+    "@type": "Organization",
+    "name": "StoneToned",
+    "url": "https://github.com/stonetoned"
+  },
+  "programmingLanguage": ["Shell", "Python", "Java", "DOT", "D2", "Mermaid"],
+  "runtimePlatform": "Docker",
+  "operatingSystem": ["Linux", "macOS", "Windows with Docker"],
+  "applicationCategory": "DeveloperApplication",
+  "keywords": [
+    "diagrams-as-code",
+    "architecture-as-code",
+    "PlantUML",
+    "Mermaid",
+    "Graphviz",
+    "D2",
+    "C4 model",
+    "UML",
+    "cloud architecture",
+    "GitHub Actions"
+  ]
+}

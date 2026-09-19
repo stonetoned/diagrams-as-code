@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a reproducible rendering, CLI, container, or documentation problem.
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping improve dgrac. Remove confidential diagram content before posting.
+  - type: input
+    id: version
+    attributes:
+      label: dgrac version
+      placeholder: "0.2.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Engine
+      options: [CLI or container, Python diagrams, PlantUML, Mermaid, Graphviz DOT, D2, Documentation]
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include the command, safe source sample, actual result, and expected result.
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Doctor output
+      description: Paste `dgrac doctor` output. Remove sensitive paths if necessary.
+      render: text

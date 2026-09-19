@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If dgrac helps your work, cite this software using the metadata below."
+title: "dgrac — Diagrams as Code"
+type: software
+authors:
+  - name: StoneToned
+version: 0.2.0
+date-released: 2026-09-19
+url: "https://stonetoned.github.io/diagrams-as-code/"
+repository-code: "https://github.com/stonetoned/diagrams-as-code"
+license: CC0-1.0
+keywords:
+  - diagrams-as-code
+  - architecture-as-code
+  - PlantUML
+  - Mermaid
+  - Graphviz
+  - D2
+  - C4 model

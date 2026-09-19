@@ -1,45 +1,144 @@
 #!/usr/bin/env sh
 set -eu
 
+DEFAULT_VERSION="0.2.0"
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname "$0")" && pwd)"
 REPO_DIR="${DGRAC_REPO_DIR:-$SCRIPT_DIR}"
-IMAGE_NAME="${DGRAC_IMAGE_NAME:-dgrac}"
 VERSION_FILE="${DGRAC_VERSION_FILE:-$REPO_DIR/VERSION}"
-COMMAND="render"
-VERSION="${DGRAC_VERSION:-$(cat "$VERSION_FILE" 2>/dev/null || echo 0.1.1)}"
+VERSION="${DGRAC_VERSION:-$(cat "$VERSION_FILE" 2>/dev/null || printf '%s' "$DEFAULT_VERSION")}"
+
+SOURCE_DIR="${DGRAC_SOURCE_DIR:-./diagrams}"
+OUTPUT_DIR="${DGRAC_OUTPUT_DIR:-./output}"
+KROKI_URL="${DGRAC_KROKI_URL:-https://kroki.io}"
+IMAGE_OVERRIDE="${DGRAC_IMAGE:-${DGRAC_IMAGE_NAME:-}}"
+BUILD_MODE="${DGRAC_BUILD:-auto}"
+COMMAND=""
+ENGINE=""
+NAME=""
+EXT=""
+JSON_OUTPUT=0
 
 print_help() {
   cat <<'EOF'
+dgrac — render diagrams as code with one Docker-powered CLI
+
 Usage:
-  dgrac [command] [options]
+  dgrac <command> [options]
+  dgrac render --engine <engine> --name <file> [options]
 
 Commands:
-  render             Render a single diagram (default)
-  render-all         Render all sample diagrams in the provided source folder
-  test               Run render + verify for sample diagrams in the source folder
-  list               List built-in sample names
-  doctor             Check local and container toolchain prerequisites
-  version            Print tool version
-  help               Show this message
+  render       Render one diagram
+  render-all   Discover and render every supported source file
+  test         Render all sources and verify every expected artifact
+  list         List discovered diagrams; add --json for machine output
+  doctor       Verify Docker and every bundled rendering engine
+  version      Print the dgrac version
+  help         Show this message
 
-Global options:
-  --source, --source-dir <path>      Host path to root diagram folder (default: ./diagrams)
-  --output, --out, --output-dir <path> Host path to output folder (default: ./output)
-  --engine <py|puml|uml|mermaid|dot|d2> (required for render)
-  --name <name> (required for render)
-  --ext, --inputext <ext>            Engine-specific extension (defaults: py/puml/mmd/dot/d2)
-  --help, -h
-  --version
+Options:
+  -s, --source, --source-dir <path>        Diagram source root (default: ./diagrams)
+  -o, --output, --out, --output-dir <path> Output root (default: ./output)
+  -e, --engine <py|puml|uml|mermaid|dot|d2>
+  -n, --name <name>                        Source filename without extension
+  -x, --ext, --inputext <ext>              Override the source extension
+      --image <container>                  Use a prebuilt renderer image
+      --kroki-url <url>                    Kroki endpoint for Mermaid
+      --json                               JSON output for `list`
+  -h, --help
+  -v, --version
+
+Environment:
+  DGRAC_SOURCE_DIR, DGRAC_OUTPUT_DIR, DGRAC_IMAGE, DGRAC_KROKI_URL
+  DGRAC_BUILD=auto|always|never
 
 Examples:
-  dgrac render --engine puml --name stack --source /opt/projects/stonetoned/bandai/infra --out /opt/projects/labs/output/diagrams
+  dgrac render --engine mermaid --name architecture
+  dgrac render-all --source ./diagrams --output ./output
+  dgrac list --source ./diagrams --json
+  DGRAC_KROKI_URL=http://localhost:8000 dgrac test
 EOF
 }
 
-if [ "$#" -gt 0 ] && [ "${1#--}" = "$1" ]; then
-  COMMAND="$1"
-  shift
-fi
+die() {
+  printf 'dgrac: %s\n' "$*" >&2
+  exit 2
+}
+
+case "${1:-}" in
+  render|render-all|test|list|doctor|version|help)
+    COMMAND="$1"
+    shift
+    ;;
+  "")
+    print_help
+    exit 0
+    ;;
+  -*)
+    COMMAND="render"
+    ;;
+  *)
+    die "unknown command: $1"
+    ;;
+esac
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -s|--source|--source-dir)
+      [ "$#" -ge 2 ] || die "missing value for $1"
+      SOURCE_DIR="$2"
+      shift 2
+      ;;
+    -o|--output|--out|--output-dir)
+      [ "$#" -ge 2 ] || die "missing value for $1"
+      OUTPUT_DIR="$2"
+      shift 2
+      ;;
+    -e|--engine)
+      [ "$#" -ge 2 ] || die "missing value for $1"
+      ENGINE="$2"
+      shift 2
+      ;;
+    -n|--name)
+      [ "$#" -ge 2 ] || die "missing value for $1"
+      NAME="$2"
+      shift 2
+      ;;
+    -x|--ext|--inputext)
+      [ "$#" -ge 2 ] || die "missing value for $1"
+      EXT="$2"
+      shift 2
+      ;;
+    --image)
+      [ "$#" -ge 2 ] || die "missing value for $1"
+      IMAGE_OVERRIDE="$2"
+      shift 2
+      ;;
+    --kroki-url)
+      [ "$#" -ge 2 ] || die "missing value for $1"
+      KROKI_URL="$2"
+      shift 2
+      ;;
+    --json)
+      JSON_OUTPUT=1
+      shift
+      ;;
+    -h|--help)
+      print_help
+      exit 0
+      ;;
+    -v|--version)
+      printf '%s\n' "$VERSION"
+      exit 0
+      ;;
+    --)
+      shift
+      [ "$#" -eq 0 ] || die "unexpected positional argument: $1"
+      ;;
+    *)
+      die "unknown option: $1"
+      ;;
+  esac
+done
 
 if [ "$COMMAND" = "help" ]; then
   print_help
@@ -47,140 +146,224 @@ if [ "$COMMAND" = "help" ]; then
 fi
 
 if [ "$COMMAND" = "version" ]; then
-  echo "$VERSION"
+  printf '%s\n' "$VERSION"
   exit 0
 fi
 
-SOURCE_DIR="${DGRAC_SOURCE_DIR:-./diagrams}"
-OUTPUT_DIR="${DGRAC_OUTPUT_DIR:-./output}"
-ENGINE=""
-NAME=""
-EXT=""
-
-while [ "$#" -gt 0 ]; do
-  case "$1" in
-    --source|--source-dir)
-      [ "$#" -ge 2 ] || { echo "missing --source value" >&2; exit 2; }
-      SOURCE_DIR="$2"
-      shift 2
-      ;;
-    --output|--out|--output-dir)
-      [ "$#" -ge 2 ] || { echo "missing --output value" >&2; exit 2; }
-      OUTPUT_DIR="$2"
-      shift 2
-      ;;
-    --engine|-e)
-      [ "$#" -ge 2 ] || { echo "missing --engine value" >&2; exit 2; }
-      ENGINE="$2"
-      shift 2
-      ;;
-    --name|-n)
-      [ "$#" -ge 2 ] || { echo "missing --name value" >&2; exit 2; }
-      NAME="$2"
-      shift 2
-      ;;
-    --ext|--inputext)
-      [ "$#" -ge 2 ] || { echo "missing --ext value" >&2; exit 2; }
-      EXT="$2"
-      shift 2
-      ;;
-    --help|-h)
-      print_help
-      exit 0
-      ;;
-    --version)
-      echo "$VERSION"
-      exit 0
-      ;;
-    *)
-      echo "unknown flag: $1" >&2
-      print_help
-      exit 2
-      ;;
-  esac
-done
-
-normalize_path() {
-  path="$1"
-  case "$path" in
-    /*) printf '%s\n' "$path" ;;
-    *) (cd "$PWD" && printf '%s/%s\n' "$PWD" "$path") ;;
-  esac
+absolute_source() {
+  [ -d "$SOURCE_DIR" ] || die "source directory not found: $SOURCE_DIR"
+  (CDPATH= cd -- "$SOURCE_DIR" && pwd -P)
 }
 
-abs_source="$(normalize_path "$SOURCE_DIR")"
-abs_output="$(normalize_path "$OUTPUT_DIR")"
-
-if [ ! -d "$abs_source" ]; then
-  echo "source directory not found: $abs_source" >&2
-  exit 1
-fi
-
-run_container() {
-  make -C "$REPO_DIR" \
-    CONTAINER_NAME="$IMAGE_NAME" \
-    IMAGE_NAME="$IMAGE_NAME" \
-    DIAGRAMS_HOST_LOCATION="$abs_source" \
-    OUTPUT_HOST_LOCATION="$abs_output" \
-    run-container
+absolute_output() {
+  mkdir -p "$OUTPUT_DIR"
+  (CDPATH= cd -- "$OUTPUT_DIR" && pwd -P)
 }
 
-stop_container() {
-  make -C "$REPO_DIR" \
-    CONTAINER_NAME="$IMAGE_NAME" \
-    stop-container >/dev/null 2>&1 || true
+engine_names() {
+  source_root="$1"
+  engine="$2"
+  case "$engine" in
+    py)
+      for path in "$source_root/py/"*.py; do
+        [ -f "$path" ] || continue
+        [ "$(basename "$path")" = "icons.py" ] && continue
+        basename "$path" .py
+      done
+      ;;
+    puml)
+      for path in "$source_root/uml/"*.puml "$source_root/uml/"*.uml; do
+        [ -f "$path" ] || continue
+        base="$(basename "$path")"
+        printf '%s\n' "${base%.*}"
+      done
+      ;;
+    mermaid)
+      for path in "$source_root/mermaid/"*.mmd; do
+        [ -f "$path" ] || continue
+        basename "$path" .mmd
+      done
+      ;;
+    dot)
+      for path in "$source_root/dot/"*.dot; do
+        [ -f "$path" ] || continue
+        basename "$path" .dot
+      done
+      ;;
+    d2)
+      for path in "$source_root/d2/"*.d2; do
+        [ -f "$path" ] || continue
+        basename "$path" .d2
+      done
+      ;;
+  esac | LC_ALL=C sort -u
 }
 
-case "$COMMAND" in
-  render|render-all|test|list|doctor|version)
-    ;;
-  *)
-    echo "unknown command: $COMMAND" >&2
-    print_help
-    exit 2
-    ;;
-esac
+json_array() {
+  first=1
+  printf '['
+  while IFS= read -r item; do
+    [ -n "$item" ] || continue
+    escaped="$(printf '%s' "$item" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+    if [ "$first" -eq 0 ]; then printf ','; fi
+    printf '"%s"' "$escaped"
+    first=0
+  done
+  printf ']'
+}
 
-if [ "$COMMAND" = "render" ]; then
-  if [ -z "$ENGINE" ] || [ -z "$NAME" ]; then
-    echo "--engine and --name are required for render" >&2
-    print_help
-    exit 2
+list_examples() {
+  source_root="$1"
+  if [ "$JSON_OUTPUT" -eq 1 ]; then
+    printf '{"version":"%s","engines":{' "$VERSION"
+    first=1
+    for engine in py puml mermaid dot d2; do
+      if [ "$first" -eq 0 ]; then printf ','; fi
+      printf '"%s":' "$engine"
+      engine_names "$source_root" "$engine" | json_array
+      first=0
+    done
+    printf '}}\n'
+  else
+    for engine in py puml mermaid dot d2; do
+      printf '%s:\n' "$engine"
+      engine_names "$source_root" "$engine" | sed 's/^/  /'
+    done
   fi
-  case "$ENGINE" in
-    py) TARGET_NAME="generate-py"; DEFAULT_EXT="py" ;;
-    puml|uml) TARGET_NAME="generate-puml"; DEFAULT_EXT="puml" ;;
-    mermaid) TARGET_NAME="generate-mermaid"; DEFAULT_EXT="mmd" ;;
-    dot) TARGET_NAME="generate-dot"; DEFAULT_EXT="dot" ;;
-    d2) TARGET_NAME="generate-d2"; DEFAULT_EXT="d2" ;;
-    *) echo "unknown engine: $ENGINE" >&2; exit 2 ;;
-  esac
-  EXT="${EXT:-$DEFAULT_EXT}"
-  trap 'stop_container' EXIT INT TERM
-  run_container >/dev/null
-  make -C "$REPO_DIR" "$TARGET_NAME" \
-    filename="$NAME" \
-    inputext="$EXT" \
-    DIAGRAMS_HOST_LOCATION="$abs_source" \
-    OUTPUT_HOST_LOCATION="$abs_output"
-  exit 0
-fi
+}
 
 if [ "$COMMAND" = "list" ]; then
-  make -C "$REPO_DIR" list
+  list_examples "$(absolute_source)"
   exit 0
 fi
+
+if [ "$COMMAND" = "render" ]; then
+  [ -n "$ENGINE" ] || die "--engine is required for render"
+  [ -n "$NAME" ] || die "--name is required for render"
+  case "$NAME" in
+    *[!A-Za-z0-9._-]*|.*|*..*) die "invalid diagram name: $NAME" ;;
+  esac
+  case "$EXT" in
+    *[!A-Za-z0-9]*) die "invalid extension: $EXT" ;;
+  esac
+  case "$ENGINE" in
+    py|puml|uml|mermaid|dot|d2) ;;
+    *) die "unknown engine: $ENGINE" ;;
+  esac
+fi
+
+command -v docker >/dev/null 2>&1 || die "Docker is required but was not found"
+docker info >/dev/null 2>&1 || die "Docker is installed but the daemon is unavailable"
+
+prepare_image() {
+  if [ -n "$IMAGE_OVERRIDE" ]; then
+    IMAGE="$IMAGE_OVERRIDE"
+    if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+      docker pull "$IMAGE" >/dev/null
+    fi
+    return
+  fi
+
+  if [ -f "$REPO_DIR/Dockerfile" ] && [ -d "$REPO_DIR/scripts" ]; then
+    IMAGE="dgrac:$VERSION"
+    case "$BUILD_MODE" in
+      auto|always)
+        docker build -t "$IMAGE" "$REPO_DIR" >/dev/null
+        ;;
+      never)
+        docker image inspect "$IMAGE" >/dev/null 2>&1 || die "image not found: $IMAGE"
+        ;;
+      *)
+        die "DGRAC_BUILD must be auto, always, or never"
+        ;;
+    esac
+  else
+    IMAGE="ghcr.io/stonetoned/diagrams-as-code:$VERSION"
+    docker image inspect "$IMAGE" >/dev/null 2>&1 || docker pull "$IMAGE" >/dev/null
+  fi
+}
+
+container_run() {
+  source_root="$1"
+  output_root="$2"
+  network_mode="$3"
+  shift 3
+
+  if [ "$network_mode" = "none" ]; then
+    docker run --rm --init \
+      --network none \
+      --security-opt no-new-privileges \
+      --cap-drop ALL \
+      --user "$(id -u):$(id -g)" \
+      --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+      -e HOME=/tmp \
+      -e KROKI_URL="$KROKI_URL" \
+      -e DGRAC_VERSION="$VERSION" \
+      -v "$source_root:/diagrams:ro" \
+      -v "$output_root:/output" \
+      --entrypoint sh \
+      "$IMAGE" "$@"
+  else
+    docker run --rm --init \
+      --security-opt no-new-privileges \
+      --cap-drop ALL \
+      --user "$(id -u):$(id -g)" \
+      --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+      -e HOME=/tmp \
+      -e KROKI_URL="$KROKI_URL" \
+      -e DGRAC_VERSION="$VERSION" \
+      -v "$source_root:/diagrams:ro" \
+      -v "$output_root:/output" \
+      --entrypoint sh \
+      "$IMAGE" "$@"
+  fi
+}
+
+prepare_image
 
 if [ "$COMMAND" = "doctor" ]; then
-  make -C "$REPO_DIR" doctor
+  docker run --rm --network none --entrypoint sh "$IMAGE" -lc '
+    set -eu
+    command -v python3 >/dev/null
+    command -v java >/dev/null
+    command -v dot >/dev/null
+    command -v d2 >/dev/null
+    command -v rsvg-convert >/dev/null
+    test -s /jars/plantuml.jar
+    python3 --version
+    java -jar /jars/plantuml.jar -version | sed -n "1p"
+    dot -V 2>&1
+    d2 --version
+  '
+  printf 'Kroki: %s\n' "$KROKI_URL"
+  printf 'Image: %s\n' "$IMAGE"
+  printf 'dgrac %s is ready.\n' "$VERSION"
   exit 0
 fi
 
-if [ "$COMMAND" = "render-all" ] || [ "$COMMAND" = "test" ]; then
-  trap 'stop_container' EXIT INT TERM
-  run_container >/dev/null
-  make -C "$REPO_DIR" "$COMMAND" \
-    DIAGRAMS_HOST_LOCATION="$abs_source" \
-    OUTPUT_HOST_LOCATION="$abs_output"
-  exit 0
-fi
+abs_source="$(absolute_source)"
+abs_output="$(absolute_output)"
+
+case "$COMMAND" in
+  render)
+    case "$ENGINE" in
+      py) renderer=py; default_ext=py; network=none ;;
+      puml|uml) renderer=puml; default_ext=puml; network=none ;;
+      mermaid) renderer=mermaid; default_ext=mmd; network=default ;;
+      dot) renderer=dot; default_ext=dot; network=none ;;
+      d2) renderer=d2; default_ext=d2; network=none ;;
+    esac
+    EXT="${EXT:-$default_ext}"
+    container_run "$abs_source" "$abs_output" "$network" /scripts/render_one.sh "$renderer" "$NAME" "$EXT"
+    ;;
+  render-all)
+    container_run "$abs_source" "$abs_output" default /scripts/render_examples.sh
+    ;;
+  test)
+    container_run "$abs_source" "$abs_output" default /scripts/render_examples.sh
+    container_run "$abs_source" "$abs_output" none /scripts/verify_examples.sh
+    ;;
+  *)
+    die "unknown command: $COMMAND"
+    ;;
+esac

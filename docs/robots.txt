@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://stonetoned.github.io/diagrams-as-code/sitemap.xml

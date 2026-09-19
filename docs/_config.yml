@@ -1,5 +1,16 @@
 theme: jekyll-theme-minimal
-title: dgrac - Diagrams as Code
-description: All-in-one diagram-as-code playground. Python diagrams, PlantUML, Mermaid, Graphviz & D2 in one Docker container.
-show_downloads: true
+title: "dgrac — Diagrams as Code"
+description: "One lean Docker-powered CLI for Python diagrams, PlantUML, Mermaid, Graphviz DOT, and D2."
+url: "https://stonetoned.github.io"
 baseurl: "/diagrams-as-code"
+repository: "stonetoned/diagrams-as-code"
+logo: "/assets/favicon.svg"
+image: "/assets/dgrac-social-card.png"
+lang: en-US
+show_downloads: true
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+exclude:
+  - GITHUB_PAGES_GUIDE.md
+  - _site

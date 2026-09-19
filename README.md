@@ -1,378 +1,171 @@
-# dgrac - Diagrams as Code
+# dgrac — Diagrams as Code
 
-> **All-in-one diagram-as-code playground**: Python diagrams, PlantUML, Mermaid, Graphviz & D2 in one Docker container. Zero setup complexity. Perfect for architecture docs, CI/CD pipelines, and infrastructure visualization.
+![dgrac social preview](docs/assets/dgrac-social-card.png)
 
-`dgrac` is a compact diagram-as-code playground with a single Docker-based workflow.
+[![CI](https://github.com/stonetoned/diagrams-as-code/actions/workflows/ci.yml/badge.svg)](https://github.com/stonetoned/diagrams-as-code/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/stonetoned/diagrams-as-code?display_name=tag)](https://github.com/stonetoned/diagrams-as-code/releases)
+[![License: CC0-1.0](https://img.shields.io/badge/license-CC0--1.0-blue.svg)](LICENSE)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/stonetoned/diagrams-as-code/badge)](https://scorecard.dev/viewer/?uri=github.com/stonetoned/diagrams-as-code)
 
-## ⚡ Quick Start (30 seconds)
+One lean, reproducible workflow for **Python diagrams, PlantUML, Mermaid, Graphviz DOT, and D2**. Render cloud architecture, C4 models, UML, sequence diagrams, ER diagrams, state machines, dependency graphs, and infrastructure documentation without installing five toolchains.
 
-```bash
-# Build the container
-make run-container
+`dgrac` is useful for local design work, architecture-as-code repositories, CI/CD documentation, GitHub Actions, and AI coding agents that need a predictable diagram renderer.
 
-# Verify everything works
-make doctor
+## Quick start
 
-# Render all examples
-make render-all
-
-# View outputs in ./output
-```
-
-That's it! All diagram engines ready to go.
-
-## 🎯 Why dgrac?
-
-| Feature | Benefit |
-|---------|---------|
-| **Single Makefile** | No npm, pip, or complex setup. Just `make`. |
-| **One Docker container** | All 5 engines in one container—no dependencies sprawl. |
-| **Zero configuration** | Works out-of-the-box with curated examples. |
-| **CI/CD ready** | Perfect for automated architecture documentation pipelines. |
-| **Engine agnostic** | Learn or switch between tools easily with the same workflow. |
-
-## 📊 Supported Diagram Engines
-
-### Python diagrams
-Best for cloud architecture diagrams driven by Python code.
+Requirements: Docker. Make is optional.
 
 ```bash
-make render engine=py filename=easy
-make render engine=py filename=medium
-make render engine=py filename=complex
+git clone https://github.com/stonetoned/diagrams-as-code.git
+cd diagrams-as-code
+
+./dgrac doctor
+./dgrac render --engine mermaid --name architecture
+./dgrac render-all
 ```
 
-**Examples:**
-- Cloud infrastructure (AWS, GCP, Azure)
-- Microservices architecture
-- Network topology
+Generated files are written under `./output/<engine>/`.
 
-### PlantUML
-Covers sequence diagrams, component diagrams, deployment diagrams, and more. Includes **C4 model support** with built-in compatibility includes (no external fetches needed).
+## Why dgrac?
+
+- **One CLI, five engines** — compare tools without changing workflows.
+- **Reproducible** — pinned renderer versions and checksum-verified downloads.
+- **Lean** — no bundled browser; D2 SVG previews use `rsvg-convert`.
+- **Safe defaults** — source mounts are read-only; non-Mermaid renders have no container network access.
+- **CI-ready** — root `action.yml`, deterministic exit codes, and dynamic artifact verification.
+- **Agent-friendly** — `llms.txt`, `llms-full.txt`, `AGENTS.md`, and JSON example discovery.
+- **Flexible** — render this repository's examples or point the CLI at any compatible source tree.
+
+## Engines and diagram types
+
+| Engine | Best for | Input | Output | Network while rendering |
+|---|---|---:|---:|---:|
+| [Python diagrams](https://diagrams.mingrammer.com/) | Cloud and infrastructure architecture | `.py` | PNG | No |
+| [PlantUML](https://plantuml.com/) | UML, C4, deployment, component, sequence | `.puml`, `.uml` | PNG | No |
+| [Mermaid](https://mermaid.js.org/) | Flowcharts, sequence, ER, state, docs | `.mmd` | PNG | Kroki endpoint |
+| [Graphviz](https://graphviz.org/) | Dependency graphs and precise graph layout | `.dot` | PNG | No |
+| [D2](https://d2lang.com/) | Modern architecture and sequence diagrams | `.d2` | SVG + PNG | No |
+
+The examples include simple-to-extreme references plus descriptive modern designs such as `architecture`, `sequence`, `er`, `state`, `deployment`, and `dependency`.
 
 ```bash
-make render engine=puml filename=medium
-make render engine=puml filename=test_c4
+./dgrac list
+./dgrac list --json   # stable machine-readable discovery for agents and scripts
 ```
 
-**Examples:**
-- Sequence diagrams
-- Component & deployment diagrams
-- C4 architecture models
+## CLI
 
-### Mermaid
-The easiest path for lightweight architecture, flowchart, and sequence diagrams in docs. Renders through Kroki.
+```text
+dgrac render --engine <py|puml|uml|mermaid|dot|d2> --name <file>
+dgrac render-all [--source DIR] [--output DIR]
+dgrac test       [--source DIR] [--output DIR]
+dgrac list       [--source DIR] [--json]
+dgrac doctor
+```
+
+Common examples:
 
 ```bash
-make render engine=mermaid filename=easy
+./dgrac render -e puml -n deployment
+./dgrac render -e mermaid -n sequence -o ./artifacts
+./dgrac render -e d2 -n sequence
+
+# Render another repository that uses py/, uml/, mermaid/, dot/, and d2/ folders.
+./dgrac test --source ../my-architecture/diagrams --output ../my-architecture/generated
 ```
 
-**Examples:**
-- Architecture diagrams
-- Flowcharts
-- Sequence & state diagrams
-- Great for embedding in Markdown docs
+Configuration is explicit and environment-friendly:
 
-### Graphviz DOT
-Useful when you want direct layout control and a very stable rendering path.
+| Variable | Purpose | Default |
+|---|---|---|
+| `DGRAC_SOURCE_DIR` | Diagram source root | `./diagrams` |
+| `DGRAC_OUTPUT_DIR` | Generated artifact root | `./output` |
+| `DGRAC_IMAGE` | Prebuilt renderer image | local build or versioned GHCR image |
+| `DGRAC_KROKI_URL` | Mermaid-compatible Kroki endpoint | `https://kroki.io` |
+| `DGRAC_BUILD` | Local image policy: `auto`, `always`, `never` | `auto` |
 
-```bash
-make render engine=dot filename=complex
-```
+For private diagrams, self-host [Kroki](https://docs.kroki.io/kroki/setup/install/) and set `DGRAC_KROKI_URL`. The other four engines render fully offline.
 
-**Examples:**
-- Dependency graphs
-- State machines
-- Custom layouts with precise control
+## Make shortcuts
 
-### D2
-A modern diagram scripting language with strong layout and styling support. Outputs both SVG and PNG.
-
-```bash
-make render engine=d2 filename=medium
-```
-
-**Examples:**
-- Modern architecture diagrams
-- Entity relationship diagrams
-- Timeline diagrams
-
-## 🚀 Common Workflows
-
-### Render a single diagram
-```bash
-make render engine=py filename=easy         # Python
-make render engine=puml filename=medium     # PlantUML
-make render engine=mermaid filename=easy    # Mermaid
-make render engine=dot filename=complex     # Graphviz
-make render engine=d2 filename=medium       # D2
-```
-
-### Render all examples
-```bash
-make render-all
-make sync-doc-examples
-```
-
-`sync-doc-examples` keeps `docs/assets/examples/` synchronized with rendered PNGs so the site gallery pages stay current.
-
-### Verify setup
 ```bash
 make doctor
-```
-
-### List available examples
-```bash
-make list
-```
-
-### Run full test suite
-```bash
+make render engine=mermaid filename=architecture
+make render-all
 make test
-```
-
-### Refresh docs gallery assets
-```bash
 make refresh-docs
 ```
 
-### Stop the container
-```bash
-make stop-container
+## GitHub Action
+
+The repository is also a composite GitHub Action:
+
+```yaml
+name: Render architecture diagrams
+on: [push, pull_request]
+
+jobs:
+  diagrams:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: stonetoned/diagrams-as-code@v0
+        with:
+          command: test
+          source: diagrams
+          output: output
+      - uses: actions/upload-artifact@v7
+        with:
+          name: diagrams
+          path: output
 ```
 
-You can also run this repo against another project with the same engine layout (`py`, `uml`, `mermaid`, `dot`, `d2`).
+For a single diagram, set `command: render`, `engine`, and `name`.
 
-#### Make mode
-```bash
-make -C /opt/projects/labs/dgrac render \
-  DIAGRAMS_HOST_LOCATION=/opt/projects/stonetoned/bandai/infra \
-  OUTPUT_HOST_LOCATION=/tmp/bandai-infra-diagrams \
-  engine=puml \
-  filename=stack \
-  inputext=puml
+## AI agents, search, and RAG
+
+The project publishes deliberately concise machine-readable entry points:
+
+- [`llms.txt`](llms.txt) — prioritized documentation map following the llms.txt proposal.
+- [`llms-full.txt`](llms-full.txt) — self-contained product and CLI context for retrieval systems.
+- [`AGENTS.md`](AGENTS.md) — verified operating instructions for coding agents.
+- `dgrac list --json` — discover installed engines and available examples without scraping prose.
+- [`codemeta.json`](codemeta.json) and [`CITATION.cff`](CITATION.cff) — structured software identity and citation metadata.
+
+For RAG, index `llms-full.txt` first, then the example source files relevant to the requested engine. These files improve accurate discovery; they do not guarantee ranking or citation by third-party AI systems.
+
+## Source layout
+
+```text
+diagrams/
+├── py/        # Python diagrams
+├── uml/       # PlantUML and C4
+├── mermaid/   # Mermaid
+├── dot/       # Graphviz DOT
+└── d2/        # D2
 ```
 
-#### CLI mode (recommended for reusable tool usage)
-```bash
-/opt/projects/labs/dgrac/dgrac render \
-  --source /opt/projects/stonetoned/bandai/infra \
-  --engine puml \
-  --name stack \
-  --ext puml \
-  --out /tmp/bandai-infra-diagrams
-```
+`render-all` discovers supported files dynamically. Add a source file to the matching top-level engine directory; no manifest update is required. `icons.py` is treated as the Python helper module and is not rendered.
 
-CLI arguments:
-- `--source` / `--source-dir`: absolute input directory
-- `--out` / `--output` / `--output-dir`: output directory
-- `--engine`: `py|puml|uml|mermaid|dot|d2`
-- `--name`: diagram name
-- `--ext` / `--inputext`: extension override (`py/puml/mmd/dot/d2`)
-- `--help`: print help
-- `--version`: print version
-
-## 📂 Project Structure
-
-```
-dgrac/
-├── diagrams/
-│   ├── py/          # Python diagram examples
-│   ├── uml/         # PlantUML examples (including C4)
-│   ├── mermaid/     # Mermaid examples
-│   ├── dot/         # Graphviz DOT examples
-│   └── d2/          # D2 examples
-├── output/          # Generated PNG/SVG outputs
-├── Makefile         # All build commands
-├── Dockerfile       # Single containerized environment
-└── README.md
-```
-
-## 📤 Output Locations
-
-Rendered diagrams are organized by engine:
-
-- **Python:** `output/py/...`
-- **PlantUML:** `output/uml/...`
-- **Mermaid:** `output/mermaid/...`
-- **Graphviz:** `output/dot/...`
-- **D2:** `output/d2/...` (includes both `.svg` and `.png`)
-
-## 🧪 Testing
-```bash
-make test
-```
-
-The test suite:
-- Renders every example in the repository
-- Verifies expected PNG files exist and are non-empty
-- Validates all 5 engines + C4 PlantUML sample
-- Gives you a quick smoke test for your setup
-
-## 🌐 Use Cases
-- **Architecture Documentation** — Generate diagrams as part of your documentation build
-- **CI/CD Pipelines** — Auto-render diagrams on every commit
-- **Infrastructure as Code** — Visualize your infrastructure definitions
-- **Technical Design Docs** — Create sequence, component, and deployment diagrams
-- **Learning Playground** — Experiment with different diagram engines and syntax
-
-## Install & versioning
-```bash
-cat VERSION
-make version
-```
+## Install the CLI
 
 ```bash
-make install PREFIX=$HOME/.local
-make install-completion PREFIX=$HOME/.local
+make install PREFIX="$HOME/.local"
 ```
+
+The installed script uses the versioned GHCR image when it is outside a source checkout. Bash and Zsh completions are included.
+
+## Development and verification
 
 ```bash
-dgrac --version
-dgrac version
+make test-cli      # parser, aliases, errors, and JSON contract
+make test-static   # metadata and documentation invariants
+make test          # full container build + every renderer + artifact checks
+make docs-build    # local Jekyll build
 ```
 
-`VERSION` is the semantic version source. Current value is `0.1.1`.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow and [SECURITY.md](SECURITY.md) for private vulnerability reporting.
 
-## Supported diagram types
+## License
 
-### Python diagrams
-
-- `diagrams/py/easy.py`
-- `diagrams/py/medium.py`
-- `diagrams/py/complex.py`
-- `diagrams/py/extreme.py`
-- `diagrams/py/consumer.py`
-
-Render:
-```bash
-make generate-py filename=easy inputext=py
-```
-
-### PlantUML
-
-- `diagrams/uml/easy.puml`
-- `diagrams/uml/medium.puml`
-- `diagrams/uml/complex.puml`
-- `diagrams/uml/extreme.puml`
-- `diagrams/uml/test.uml`
-- `diagrams/uml/test_c4.puml`
-- `diagrams/uml/test_c4_complex_enterprise.puml`
-- `diagrams/uml/test_c4_realtime_dispatch.puml`
-
-Render:
-```bash
-make generate-puml filename=complex inputext=puml
-```
-
-The C4 example uses a small local compatibility include so it renders without external fetches.
-
-### Mermaid
-
-Mermaid is the easiest path for lightweight architecture, flowchart, and sequence diagrams in docs.
-In this repo, Mermaid examples are rendered through Kroki, which keeps the container small and avoids browser setup.
-
-Example files:
-
-- `diagrams/mermaid/easy.mmd`
-- `diagrams/mermaid/medium.mmd`
-- `diagrams/mermaid/complex.mmd`
-- `diagrams/mermaid/extreme.mmd`
-
-Render:
-```bash
-make generate-mermaid filename=medium inputext=mmd
-```
-
-### Graphviz DOT
-
-DOT is useful when you want direct layout control and a very stable rendering path.
-
-Example files:
-
-- `diagrams/dot/easy.dot`
-- `diagrams/dot/medium.dot`
-- `diagrams/dot/complex.dot`
-- `diagrams/dot/extreme.dot`
-
-Render:
-
-```bash
-make generate-dot filename=complex inputext=dot
-```
-
-### D2
-
-D2 is a modern diagram scripting language with strong layout and styling support.
-
-Example files:
-
-- `diagrams/d2/easy.d2`
-- `diagrams/d2/medium.d2`
-- `diagrams/d2/complex.d2`
-- `diagrams/d2/extreme.d2`
-
-Render:
-
-```bash
-make generate-d2 filename=easy inputext=d2
-```
-
-## Output layout
-
-Rendered PNGs are written to:
-
-- `output/py/...`
-- `output/uml/...`
-- `output/mermaid/...`
-- `output/dot/...`
-- `output/d2/...`
-
-D2 also keeps the native SVG output next to the PNG preview:
-
-- `output/d2/*.svg`
-- `output/d2/*.png`
-
-To change this in the same run, set:
-
-- `DIAGRAMS_HOST_LOCATION` (default: `./diagrams`)
-- `OUTPUT_HOST_LOCATION` (default: `./output`)
-
-## What `make test` checks
-
-`make test` renders every example in the repository and verifies the expected PNG files exist and are non-empty.
-
-That gives you a quick smoke test for:
-
-- Python `diagrams`
-- PlantUML
-- Mermaid
-- Graphviz DOT
-- D2
-- the C4 PlantUML sample
-
-## 📋 What's Included
-
-This repo provides:
-- **5 diagram engines** — compare and choose what works for you
-- **Sample inputs** for easy, medium, and complex diagrams per engine
-- **C4 PlantUML** — industry-standard architecture modeling
-- **Docker containerization** — reproducible environment
-- **Makefile automation** — simple, explicit commands
-- **Comprehensive examples** — from basic to advanced
-
-## 🔧 Requirements
-
-- Docker
-- Make
-- That's it!
-
-## 📝 License
-
-Creative Commons Zero v1.0 Universal (CC0) — Use freely, no attribution required.
-
-## 🤝 Contributing
-
-Found a bug? Have a great example? Issues and PRs welcome!
-
----
+[CC0 1.0 Universal](LICENSE). Use, copy, modify, and redistribute the project without an attribution requirement.

@@ -1,0 +1,30 @@
+@startuml
+title Production Deployment
+skinparam backgroundColor #F8FAFC
+skinparam componentStyle rectangle
+
+actor Developer
+cloud "GitHub Actions" as CI
+
+node "Kubernetes Cluster" {
+  node "Ingress" {
+    component "API Gateway" as Gateway
+  }
+  node "Application Namespace" {
+    component "Diagram API" as API
+    component "Render Worker" as Worker
+  }
+}
+
+database "PostgreSQL" as DB
+queue "Event Bus" as Queue
+storage "Object Storage" as Storage
+
+Developer --> CI : push
+CI --> API : deploy
+Gateway --> API : HTTPS
+API --> DB
+API --> Queue
+Queue --> Worker
+Worker --> Storage
+@enduml

@@ -1,0 +1,16 @@
+shape: sequence_diagram
+
+user: User
+web: Web App
+api: API Gateway
+service: Diagram Service
+store: Artifact Store
+
+user -> web: Submit source
+web -> api: POST /renders
+api -> service: Validate and render
+service -> store: Save artifact
+store -> service: Artifact URL
+service -> api: Render result
+api -> web: 201 Created
+web -> user: Show diagram

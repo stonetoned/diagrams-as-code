@@ -27,7 +27,9 @@ _dgrac() {
             '(--output --out --output-dir)'{-o,--output}'[output dir]:outdir:_files -/' \
             {-e,--engine}'[engine]:engine:(py puml uml mermaid dot d2)' \
             {-n,--name}'[diagram name]:name:' \
-            '(*--ext|--inputext)[extension]:ext:(py puml mmd dot d2)' \
+            {-x,--ext,--inputext}'[extension]:ext:(py puml mmd dot d2)' \
+            '--image[container image]:image:' \
+            '--kroki-url[Kroki endpoint]:url:' \
             {-h,--help}'[show help]' \
             {-v,--version}'[show version]'
           ;;
@@ -35,6 +37,8 @@ _dgrac() {
           _arguments \
             '(--source --source-dir)'{-s,--source}'[diagram source dir]:source:_files -/' \
             '(--output --out --output-dir)'{-o,--output}'[output dir]:outdir:_files -/' \
+            '--image[container image]:image:' \
+            '--kroki-url[Kroki endpoint]:url:' \
             {-h,--help}'[show help]' \
             {-v,--version}'[show version]'
           ;;

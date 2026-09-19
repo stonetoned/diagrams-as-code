@@ -1,75 +1,76 @@
-  <a href="{{ site.baseurl }}/gallery.html#engine-gallery" class="btn btn-primary">🧭 Engines</a>
-</div>
-
+---
+layout: default
+title: "Diagram gallery"
+description: "Compare architecture, UML, Mermaid, Graphviz, D2, and Python diagrams rendered by dgrac."
+image: /assets/dgrac-social-card.png
 ---
 
-This gallery uses the generated PNG outputs from the project examples and lets you preview outputs per engine quickly.
+# Diagram gallery
 
-## Engines Overview
+<div class="page-actions">
+  <a href="{{ '/' | relative_url }}" class="button">Home</a>
+  <a href="{{ '/cli.html' | relative_url }}" class="button">CLI reference</a>
+  <a href="https://github.com/stonetoned/diagrams-as-code/tree/main/diagrams" class="button primary">View source</a>
+</div>
 
-- [Python diagrams]({{ site.baseurl }}/gallery.html#python-diagrams)
-- [PlantUML]({{ site.baseurl }}/gallery.html#plantuml)
-- [Mermaid]({{ site.baseurl }}/gallery.html#mermaid)
-- [Graphviz DOT]({{ site.baseurl }}/gallery.html#graphviz-dot)
-- [D2]({{ site.baseurl }}/gallery.html#d2)
+Every preview below is generated from a text source in the repository and verified by `dgrac test`.
 
-## Engine Gallery {#engine-gallery}
+## Modern architecture and design
 
-### Python diagrams
-
-<div class="example-grid" id="python-diagrams">
-  <a class="example-item" href="{{ site.baseurl }}/assets/examples/py/complex.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/py/complex.png" alt="Python diagrams complex example" />
-    <div class="example-info">
-      <strong>py/complex</strong>
-      <div>Expanded distributed services graph</div>
-    </div>
+<div class="example-grid">
+  <a class="example-card" href="{{ '/assets/examples/mermaid/architecture.png' | relative_url }}">
+    <img src="{{ '/assets/examples/mermaid/architecture.png' | relative_url }}" alt="Mermaid service architecture diagram" loading="lazy" />
+    <strong>Service architecture</strong><span>Mermaid</span>
   </a>
-  <a class="example-item" href="{{ site.baseurl }}/assets/examples/py/extreme.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/py/extreme.png" alt="Python diagrams extreme example" />
-    <div class="example-info">
-      <strong>py/extreme</strong>
-      <div>Extreme-scale infrastructure example</div>
-    </div>
+  <a class="example-card" href="{{ '/assets/examples/mermaid/sequence.png' | relative_url }}">
+    <img src="{{ '/assets/examples/mermaid/sequence.png' | relative_url }}" alt="Mermaid order sequence diagram" loading="lazy" />
+    <strong>Order sequence</strong><span>Mermaid</span>
   </a>
-  <a class="example-item" href="{{ site.baseurl }}/assets/examples/py/consumer.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/py/consumer.png" alt="Python diagrams consumer example" />
-    <div class="example-info">
-      <strong>py/consumer</strong>
-      <div>Consumer-facing service topology</div>
-    </div>
+  <a class="example-card" href="{{ '/assets/examples/mermaid/er.png' | relative_url }}">
+    <img src="{{ '/assets/examples/mermaid/er.png' | relative_url }}" alt="Mermaid entity relationship diagram" loading="lazy" />
+    <strong>Entity relationship model</strong><span>Mermaid</span>
   </a>
-  <a class="example-item" href="{{ site.baseurl }}/assets/examples/py/easy.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/py/easy.png" alt="Python diagrams easy example" />
-    <div class="example-info">
-      <strong>py/easy</strong>
-      <div>Cloud architecture diagram</div>
-    </div>
+  <a class="example-card" href="{{ '/assets/examples/mermaid/state.png' | relative_url }}">
+    <img src="{{ '/assets/examples/mermaid/state.png' | relative_url }}" alt="Mermaid render lifecycle state diagram" loading="lazy" />
+    <strong>Render lifecycle</strong><span>Mermaid</span>
   </a>
-  <a class="example-item" href="{{ site.baseurl }}/assets/examples/py/medium.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/py/medium.png" alt="Python diagrams medium example" />
-    <div class="example-info">
-      <strong>py/medium</strong>
-      <div>Distributed service topology</div>
-    </div>
+  <a class="example-card" href="{{ '/assets/examples/uml/deployment.png' | relative_url }}">
+    <img src="{{ '/assets/examples/uml/deployment.png' | relative_url }}" alt="PlantUML Kubernetes deployment diagram" loading="lazy" />
+    <strong>Production deployment</strong><span>PlantUML</span>
+  </a>
+  <a class="example-card" href="{{ '/assets/examples/d2/sequence.png' | relative_url }}">
+    <img src="{{ '/assets/examples/d2/sequence.png' | relative_url }}" alt="D2 diagram rendering sequence" loading="lazy" />
+    <strong>Render request sequence</strong><span>D2</span>
+  </a>
+  <a class="example-card" href="{{ '/assets/examples/dot/dependency.png' | relative_url }}">
+    <img src="{{ '/assets/examples/dot/dependency.png' | relative_url }}" alt="Graphviz renderer dependency graph" loading="lazy" />
+    <strong>Renderer dependencies</strong><span>Graphviz</span>
+  </a>
+  <a class="example-card" href="{{ '/assets/examples/py/complex.png' | relative_url }}">
+    <img src="{{ '/assets/examples/py/complex.png' | relative_url }}" alt="Python diagrams distributed cloud architecture" loading="lazy" />
+    <strong>Cloud architecture</strong><span>Python diagrams</span>
   </a>
 </div>
 
-### PlantUML
+## C4 and enterprise architecture
 
-<div class="example-grid" id="plantuml">
-  <a class="example-item" href="{{ site.baseurl }}/assets/examples/uml/easy.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/uml/easy.png" alt="PlantUML easy example" />
-    <div class="example-info">
-      <strong>uml/easy</strong>
-      <div>Base sequence style diagram</div>
-    </div>
+<div class="example-grid">
+  <a class="example-card" href="{{ '/assets/examples/uml/test_c4.png' | relative_url }}">
+    <img src="{{ '/assets/examples/uml/test_c4.png' | relative_url }}" alt="C4 container architecture example" loading="lazy" />
+    <strong>C4 container model</strong><span>PlantUML</span>
   </a>
-  <a class="example-item" href="{{ site.baseurl }}/assets/examples/uml/medium.png" target="_blank">
-    <img src="{{ site.baseurl }}/assets/examples/uml/medium.png" alt="PlantUML medium example" />
-    <div class="example-info">
-      <strong>uml/medium</strong>
-      <div>Moderate UML sequence with decisions</div>
-    </div>
+  <a class="example-card" href="{{ '/assets/examples/uml/test_c4_complex_enterprise.png' | relative_url }}">
+    <img src="{{ '/assets/examples/uml/test_c4_complex_enterprise.png' | relative_url }}" alt="Complex enterprise C4 architecture" loading="lazy" />
+    <strong>Enterprise C4 system</strong><span>PlantUML</span>
   </a>
-  <a class="example-item" href="{{ site.baseurl }}/assets/examples/uml/complex.png" target="_blank">
+  <a class="example-card" href="{{ '/assets/examples/d2/complex.png' | relative_url }}">
+    <img src="{{ '/assets/examples/d2/complex.png' | relative_url }}" alt="D2 complex system architecture" loading="lazy" />
+    <strong>Styled system architecture</strong><span>D2</span>
+  </a>
+  <a class="example-card" href="{{ '/assets/examples/dot/complex.png' | relative_url }}">
+    <img src="{{ '/assets/examples/dot/complex.png' | relative_url }}" alt="Graphviz complex dependency layout" loading="lazy" />
+    <strong>Complex graph layout</strong><span>Graphviz</span>
+  </a>
+</div>
+
+Render any example locally with `./dgrac render --engine ENGINE --name NAME`.

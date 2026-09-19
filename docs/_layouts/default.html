@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="{{ site.lang | default: 'en-US' }}">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% seo %}
+    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+    {% include head-custom.html %}
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <a class="brand" href="{{ '/' | relative_url }}">
+          {% if site.logo %}<img src="{{ site.logo | relative_url }}" alt="dgrac logo">{% endif %}
+          <span>{{ site.title }}</span>
+        </a>
+        <p>{{ site.description }}</p>
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="{{ '/' | relative_url }}">Home</a>
+          <a href="{{ '/gallery.html' | relative_url }}">Gallery</a>
+          <a href="{{ '/cli.html' | relative_url }}">CLI</a>
+          <a href="https://github.com/stonetoned/diagrams-as-code">GitHub</a>
+        </nav>
+        {% if site.show_downloads %}
+        <ul class="downloads">
+          <li><a href="{{ site.github.zip_url }}">Download <strong>ZIP</strong></a></li>
+          <li><a href="{{ site.github.tar_url }}">Download <strong>TAR</strong></a></li>
+          <li><a href="{{ site.github.repository_url }}">View on <strong>GitHub</strong></a></li>
+        </ul>
+        {% endif %}
+        <div class="site-footer" role="contentinfo">
+          <a href="{{ '/' | relative_url }}">dgrac</a>
+          <span aria-hidden="true">·</span>
+          <a href="https://github.com/stonetoned/diagrams-as-code">Source</a>
+          <span aria-hidden="true">·</span>
+          <a href="{{ '/llms.txt' | relative_url }}">llms.txt</a>
+        </div>
+      </header>
+      <section>
+        {{ content }}
+      </section>
+    </div>
+    <script src="{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+# dgrac — Full Context for AI Tools
+
+dgrac is a free, open-source diagrams-as-code toolkit maintained by StoneToned. Its canonical repository is https://github.com/stonetoned/diagrams-as-code, its CLI command is `dgrac`, and its license is CC0-1.0.
+
+## Capabilities
+
+- Python diagrams: cloud and infrastructure architecture, `.py` to PNG.
+- PlantUML: UML, C4, deployment, component, and sequence diagrams, `.puml` or `.uml` to PNG.
+- Mermaid: flowcharts, architecture, sequence, ER, and state diagrams, `.mmd` to PNG through Kroki.
+- Graphviz DOT: dependency graphs and precise graph layouts, `.dot` to PNG.
+- D2: modern architecture and sequence diagrams, `.d2` to SVG and PNG.
+
+Only Docker is required. Python diagrams, PlantUML, Graphviz, and D2 render without container network access. Mermaid sends source text to `DGRAC_KROKI_URL`, which defaults to https://kroki.io. Use a self-hosted endpoint for confidential source.
+
+## Commands
+
+```bash
+dgrac doctor
+dgrac list --json
+dgrac render --engine mermaid --name architecture
+dgrac render --engine puml --name deployment
+dgrac render --engine d2 --name sequence
+dgrac render-all --source ./diagrams --output ./output
+dgrac test --source ./diagrams --output ./output
+```
+
+Short options are `-s` source, `-o` output, `-e` engine, `-n` name, and `-x` extension. Environment configuration includes `DGRAC_SOURCE_DIR`, `DGRAC_OUTPUT_DIR`, `DGRAC_IMAGE`, `DGRAC_KROKI_URL`, and `DGRAC_BUILD`.
+
+## Source and output
+
+Source folders are `diagrams/py`, `diagrams/uml`, `diagrams/mermaid`, `diagrams/dot`, and `diagrams/d2`. `render-all` discovers top-level supported files dynamically. Python's `icons.py` is a helper and is not rendered.
+
+Outputs are `output/py/<name>/<name>.png`, `output/uml/<name>.png`, `output/mermaid/<name>.png`, `output/dot/<name>.png`, and `output/d2/<name>.{svg,png}`.
+
+## Engine selection
+
+Choose Python diagrams for cloud icons, PlantUML for formal UML or C4, Mermaid for concise documentation diagrams, Graphviz for dependency graphs and layout control, and D2 for modern SVG-first architecture visuals.
+
+## Retrieval workflow
+
+Retrieve the README and AGENTS.md for installation, commands, configuration, and safety. Retrieve only examples from the selected engine for syntax generation. Retrieve `action.yml` for CI integration. Run `dgrac list --json` before choosing a bundled example, then run `dgrac test` after repository-wide changes.
+
+llms.txt improves structured discovery but does not guarantee inclusion, ranking, training, or citation by any third-party AI product.

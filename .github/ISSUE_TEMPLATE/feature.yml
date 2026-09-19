@@ -1,0 +1,26 @@
+name: Feature request
+description: Propose a focused capability or example that benefits diagrams-as-code users.
+title: "feature: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What workflow is difficult today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the smallest useful change and any alternatives.
+    validations:
+      required: true
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Project fit
+      options:
+        - label: This keeps Docker as the only required host runtime.
+        - label: This is useful beyond one private architecture.

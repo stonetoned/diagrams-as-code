@@ -1,0 +1,18 @@
+digraph Dependencies {
+  graph [rankdir=LR, bgcolor="transparent", pad=0.3, nodesep=0.5, ranksep=0.8];
+  node [shape=box, style="rounded,filled", fontname="Arial", color="#6366f1", fillcolor="#eef2ff"];
+  edge [color="#64748b", arrowsize=0.8];
+
+  cli [label="dgrac CLI", fillcolor="#e0f2fe", color="#0ea5e9"];
+  docker [label="Renderer Container"];
+  python [label="Python diagrams"];
+  plantuml [label="PlantUML"];
+  mermaid [label="Mermaid / Kroki"];
+  graphviz [label="Graphviz"];
+  d2 [label="D2"];
+  artifacts [label="PNG + SVG artifacts", shape=folder, fillcolor="#f3e8ff", color="#a855f7"];
+
+  cli -> docker;
+  docker -> {python plantuml mermaid graphviz d2};
+  {python plantuml mermaid graphviz d2} -> artifacts;
+}

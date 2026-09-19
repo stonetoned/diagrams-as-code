@@ -1,0 +1,28 @@
+erDiagram
+    USER ||--o{ PROJECT : owns
+    PROJECT ||--o{ DIAGRAM : contains
+    DIAGRAM ||--o{ REVISION : tracks
+    USER ||--o{ REVISION : authors
+
+    USER {
+        uuid id PK
+        string handle UK
+        string email UK
+    }
+    PROJECT {
+        uuid id PK
+        uuid owner_id FK
+        string name
+    }
+    DIAGRAM {
+        uuid id PK
+        uuid project_id FK
+        string engine
+        string source_path
+    }
+    REVISION {
+        uuid id PK
+        uuid diagram_id FK
+        uuid author_id FK
+        string commit_sha
+    }

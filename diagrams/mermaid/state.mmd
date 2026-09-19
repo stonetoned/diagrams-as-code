@@ -1,0 +1,11 @@
+stateDiagram-v2
+    [*] --> Draft
+    Draft --> Validating: submit
+    Validating --> Draft: invalid
+    Validating --> Rendering: valid
+    Rendering --> Published: success
+    Rendering --> Failed: renderer error
+    Failed --> Rendering: retry
+    Published --> Draft: edit
+    Published --> Archived: archive
+    Archived --> [*]

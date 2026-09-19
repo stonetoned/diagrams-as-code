@@ -1,46 +1,54 @@
 #!/usr/bin/env sh
 set -eu
 
-OUTPUT_ROOT="${OUTPUT_ROOT:-output}"
-
-required_paths="
-${OUTPUT_ROOT}/py/easy/easy.png
-${OUTPUT_ROOT}/py/medium/medium.png
-${OUTPUT_ROOT}/py/complex/complex.png
-${OUTPUT_ROOT}/py/extreme/extreme.png
-${OUTPUT_ROOT}/py/consumer/consumer.png
-${OUTPUT_ROOT}/uml/easy.png
-${OUTPUT_ROOT}/uml/medium.png
-${OUTPUT_ROOT}/uml/complex.png
-${OUTPUT_ROOT}/uml/extreme.png
-${OUTPUT_ROOT}/uml/test.png
-${OUTPUT_ROOT}/uml/test_c4.png
-${OUTPUT_ROOT}/uml/test_c4_complex_enterprise.png
-${OUTPUT_ROOT}/uml/test_c4_realtime_dispatch.png
-${OUTPUT_ROOT}/mermaid/easy.png
-${OUTPUT_ROOT}/mermaid/medium.png
-${OUTPUT_ROOT}/mermaid/complex.png
-${OUTPUT_ROOT}/mermaid/extreme.png
-${OUTPUT_ROOT}/dot/easy.png
-${OUTPUT_ROOT}/dot/medium.png
-${OUTPUT_ROOT}/dot/complex.png
-${OUTPUT_ROOT}/dot/extreme.png
-${OUTPUT_ROOT}/d2/easy.png
-${OUTPUT_ROOT}/d2/medium.png
-${OUTPUT_ROOT}/d2/complex.png
-${OUTPUT_ROOT}/d2/extreme.png
-${OUTPUT_ROOT}/d2/easy.svg
-${OUTPUT_ROOT}/d2/medium.svg
-${OUTPUT_ROOT}/d2/complex.svg
-${OUTPUT_ROOT}/d2/extreme.svg
-"
-
+ROOT="${ROOT:-${DIAGRAMS_ROOT:-/diagrams}}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-${DGRAC_OUTPUT_ROOT:-/output}}"
+checked=0
 status=0
-for path in $required_paths; do
+
+check_file() {
+  path="$1"
   if [ ! -s "$path" ]; then
     echo "missing or empty: $path" >&2
     status=1
   fi
+  checked=$((checked + 1))
+}
+
+for path in "$ROOT/py/"*.py; do
+  [ -f "$path" ] || continue
+  [ "$(basename "$path")" = "icons.py" ] && continue
+  name="$(basename "$path" .py)"
+  check_file "$OUTPUT_ROOT/py/$name/$name.png"
 done
 
+for path in "$ROOT/uml/"*.puml "$ROOT/uml/"*.uml; do
+  [ -f "$path" ] || continue
+  filename="$(basename "$path")"
+  check_file "$OUTPUT_ROOT/uml/${filename%.*}.png"
+done
+
+for path in "$ROOT/mermaid/"*.mmd; do
+  [ -f "$path" ] || continue
+  check_file "$OUTPUT_ROOT/mermaid/$(basename "$path" .mmd).png"
+done
+
+for path in "$ROOT/dot/"*.dot; do
+  [ -f "$path" ] || continue
+  check_file "$OUTPUT_ROOT/dot/$(basename "$path" .dot).png"
+done
+
+for path in "$ROOT/d2/"*.d2; do
+  [ -f "$path" ] || continue
+  name="$(basename "$path" .d2)"
+  check_file "$OUTPUT_ROOT/d2/$name.svg"
+  check_file "$OUTPUT_ROOT/d2/$name.png"
+done
+
+[ "$checked" -gt 0 ] || {
+  echo "no diagram sources found under $ROOT" >&2
+  exit 1
+}
+
+[ "$status" -eq 0 ] && printf 'Verified %s generated artifacts.\n' "$checked"
 exit "$status"

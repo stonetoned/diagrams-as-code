@@ -1,0 +1,69 @@
+name: "dgrac Diagrams as Code"
+description: "Render and verify Python diagrams, PlantUML, Mermaid, Graphviz, and D2 with one reproducible action."
+author: "StoneToned"
+branding:
+  icon: "image"
+  color: "blue"
+
+inputs:
+  command:
+    description: "render, render-all, or test"
+    required: false
+    default: "render-all"
+  engine:
+    description: "Engine for command=render: py, puml, uml, mermaid, dot, or d2"
+    required: false
+    default: ""
+  name:
+    description: "Source filename without extension for command=render"
+    required: false
+    default: ""
+  source:
+    description: "Diagram source directory, relative to the workspace"
+    required: false
+    default: "diagrams"
+  output:
+    description: "Generated output directory, relative to the workspace"
+    required: false
+    default: "output"
+  kroki-url:
+    description: "Kroki endpoint used for Mermaid rendering"
+    required: false
+    default: "https://kroki.io"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Render diagrams
+      shell: bash
+      env:
+        DGRAC_ACTION_COMMAND: ${{ inputs.command }}
+        DGRAC_ACTION_ENGINE: ${{ inputs.engine }}
+        DGRAC_ACTION_NAME: ${{ inputs.name }}
+        DGRAC_ACTION_SOURCE: ${{ inputs.source }}
+        DGRAC_ACTION_OUTPUT: ${{ inputs.output }}
+        DGRAC_KROKI_URL: ${{ inputs.kroki-url }}
+      run: |
+        set -euo pipefail
+        source_path="$GITHUB_WORKSPACE/$DGRAC_ACTION_SOURCE"
+        output_path="$GITHUB_WORKSPACE/$DGRAC_ACTION_OUTPUT"
+
+        case "$DGRAC_ACTION_COMMAND" in
+          render)
+            if [[ -z "$DGRAC_ACTION_ENGINE" || -z "$DGRAC_ACTION_NAME" ]]; then
+              echo "engine and name are required when command=render" >&2
+              exit 2
+            fi
+            "$GITHUB_ACTION_PATH/dgrac" render \
+              --source "$source_path" --output "$output_path" \
+              --engine "$DGRAC_ACTION_ENGINE" --name "$DGRAC_ACTION_NAME"
+            ;;
+          render-all|test)
+            "$GITHUB_ACTION_PATH/dgrac" "$DGRAC_ACTION_COMMAND" \
+              --source "$source_path" --output "$output_path"
+            ;;
+          *)
+            echo "command must be render, render-all, or test" >&2
+            exit 2
+            ;;
+        esac

@@ -1,12 +1,4 @@
-.dockerignore
-docker-compose.yml
-Dockerfile
-Makefile
-
-.git/
-*.egg-info
-*.egg/
-*.pyc
-.tox
-*/__pycache__
-output/
+*
+!Dockerfile
+!scripts/
+!scripts/*.sh

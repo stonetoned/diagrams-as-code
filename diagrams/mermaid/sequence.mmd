@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Web as Web App
+    participant API as API Gateway
+    participant Auth as Identity Service
+    participant Orders as Order Service
+    participant Queue as Event Bus
+
+    User->>Web: Submit order
+    Web->>API: POST /orders
+    API->>Auth: Validate token
+    Auth-->>API: Identity + scopes
+    API->>Orders: Create order
+    par Persist and publish
+        Orders->>Orders: Store order
+    and Notify downstream systems
+        Orders->>Queue: order.created
+    end
+    Orders-->>API: 201 Created
+    API-->>Web: Order response
+    Web-->>User: Confirmation

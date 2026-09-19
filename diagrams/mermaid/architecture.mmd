@@ -1,0 +1,16 @@
+flowchart LR
+    user([User]) --> edge[Edge Gateway]
+    edge --> api[API Service]
+    api --> queue[(Event Queue)]
+    api --> cache[(Cache)]
+    api --> db[(Primary Database)]
+    queue --> worker[Async Worker]
+    worker --> db
+    worker --> search[(Search Index)]
+
+    classDef client fill:#111827,stroke:#38bdf8,color:#f8fafc
+    classDef service fill:#172554,stroke:#818cf8,color:#f8fafc
+    classDef data fill:#2e1065,stroke:#c084fc,color:#f8fafc
+    class user client
+    class edge,api,worker service
+    class queue,cache,db,search data
