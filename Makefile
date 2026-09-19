@@ -121,22 +121,28 @@ sync-doc-examples:
 refresh-docs: render-all sync-doc-examples
 
 docs-build:
-	@mkdir -p "$(DOCS_SOURCE_LOCATION)"
+	@mkdir -p "$(DOCS_SOURCE_LOCATION)/$(DOCS_BUILD_DIRECTORY)"
+	@chmod 0777 "$(DOCS_SOURCE_LOCATION)/$(DOCS_BUILD_DIRECTORY)"
 	docker run --rm \
-		-v "$(DOCS_SOURCE_LOCATION):/srv/jekyll" \
+		-v "$(DOCS_SOURCE_LOCATION):/srv/jekyll:ro" \
+		-v "$(DOCS_SOURCE_LOCATION)/$(DOCS_BUILD_DIRECTORY):/srv/jekyll/$(DOCS_BUILD_DIRECTORY)" \
 		-e BASE_URL="$(DOCS_BASE_URL)" \
-		jekyll/jekyll:4.2.2 sh -lc 'gem install --no-document jekyll-theme-minimal jekyll-sitemap >/dev/null && \
-			jekyll build --source /srv/jekyll --destination /srv/jekyll/$(DOCS_BUILD_DIRECTORY) --config /srv/jekyll/_config.yml --baseurl "$$BASE_URL" --trace'
+		--entrypoint sh \
+		jekyll/jekyll:4.2.2 -c '/usr/local/bin/gem install --no-document jekyll-theme-minimal jekyll-sitemap >/dev/null && \
+			/usr/gem/bin/jekyll build --source /srv/jekyll --destination /srv/jekyll/$(DOCS_BUILD_DIRECTORY) --config /srv/jekyll/_config.yml --baseurl "$$BASE_URL" --disable-disk-cache --trace'
 
 docs-serve:
-	@mkdir -p "$(DOCS_SOURCE_LOCATION)"
+	@mkdir -p "$(DOCS_SOURCE_LOCATION)/$(DOCS_BUILD_DIRECTORY)"
+	@chmod 0777 "$(DOCS_SOURCE_LOCATION)/$(DOCS_BUILD_DIRECTORY)"
 	@echo "Serving docs at http://localhost:$(DOCS_PORT)$(DOCS_BASE_URL)/"
 	docker run --rm \
-		-v "$(DOCS_SOURCE_LOCATION):/srv/jekyll" \
+		-v "$(DOCS_SOURCE_LOCATION):/srv/jekyll:ro" \
+		-v "$(DOCS_SOURCE_LOCATION)/$(DOCS_BUILD_DIRECTORY):/srv/jekyll/$(DOCS_BUILD_DIRECTORY)" \
 		-e BASE_URL="$(DOCS_BASE_URL)" \
 		-p "$(DOCS_HOST):$(DOCS_PORT):$(DOCS_PORT)" \
-		jekyll/jekyll:4.2.2 sh -lc 'gem install --no-document jekyll-theme-minimal jekyll-sitemap >/dev/null && \
-			jekyll serve --host 0.0.0.0 --port $(DOCS_PORT) --source /srv/jekyll --destination /srv/jekyll/$(DOCS_BUILD_DIRECTORY) --config /srv/jekyll/_config.yml --baseurl "$$BASE_URL" --livereload --trace'
+		--entrypoint sh \
+		jekyll/jekyll:4.2.2 -c '/usr/local/bin/gem install --no-document jekyll-theme-minimal jekyll-sitemap >/dev/null && \
+			/usr/gem/bin/jekyll serve --host 0.0.0.0 --port $(DOCS_PORT) --source /srv/jekyll --destination /srv/jekyll/$(DOCS_BUILD_DIRECTORY) --config /srv/jekyll/_config.yml --baseurl "$$BASE_URL" --disable-disk-cache --livereload --trace'
 
 version:
 	@cat VERSION
