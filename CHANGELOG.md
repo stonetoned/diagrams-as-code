@@ -2,6 +2,14 @@
 
 All notable changes are documented here.
 
+## Unreleased
+
+### Changed
+
+- Improved dark-mode code contrast across the documentation site.
+- Added an end-to-end smoke test for the packaged GitHub Action to CI and release gates.
+- Removed an unconfigured security badge and obsolete Pages setup notes from customer-facing documentation.
+
 ## [0.2.0] - 2026-09-19
 
 ### Added

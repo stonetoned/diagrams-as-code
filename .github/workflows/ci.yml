@@ -26,6 +26,18 @@ jobs:
       - name: Build documentation
         run: make docs-build
 
+      - name: Smoke test the packaged GitHub Action
+        uses: ./
+        with:
+          command: render
+          engine: dot
+          name: easy
+          source: diagrams
+          output: action-smoke-output
+
+      - name: Verify the Action artifact
+        run: test -s action-smoke-output/dot/easy.png
+
       - name: Upload rendered examples
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

@@ -5,7 +5,8 @@
 [![CI](https://github.com/stonetoned/diagrams-as-code/actions/workflows/ci.yml/badge.svg)](https://github.com/stonetoned/diagrams-as-code/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/stonetoned/diagrams-as-code?display_name=tag)](https://github.com/stonetoned/diagrams-as-code/releases)
 [![License: CC0-1.0](https://img.shields.io/badge/license-CC0--1.0-blue.svg)](LICENSE)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/stonetoned/diagrams-as-code/badge)](https://scorecard.dev/viewer/?uri=github.com/stonetoned/diagrams-as-code)
+
+[Documentation](https://stonetoned.github.io/diagrams-as-code/) · [Gallery](https://stonetoned.github.io/diagrams-as-code/gallery.html) · [CLI reference](https://stonetoned.github.io/diagrams-as-code/cli.html) · [Discussions](https://github.com/stonetoned/diagrams-as-code/discussions) · [Releases](https://github.com/stonetoned/diagrams-as-code/releases)
 
 One lean, reproducible workflow for **Python diagrams, PlantUML, Mermaid, Graphviz DOT, and D2**. Render cloud architecture, C4 models, UML, sequence diagrams, ER diagrams, state machines, dependency graphs, and infrastructure documentation without installing five toolchains.
 
@@ -165,6 +166,8 @@ make docs-build    # local Jekyll build
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow and [SECURITY.md](SECURITY.md) for private vulnerability reporting.
+
+Questions and usage ideas belong in [GitHub Discussions](https://github.com/stonetoned/diagrams-as-code/discussions). Reproducible bugs and focused feature requests can be submitted through the repository's [issue forms](https://github.com/stonetoned/diagrams-as-code/issues/new/choose).
 
 ## License
 
