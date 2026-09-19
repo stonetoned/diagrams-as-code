@@ -79,7 +79,7 @@ make render-all
 
 ### 1. Clone & Enter Directory
 ```bash
-git clone https://github.com/nosahama/dgrac.git
+git clone https://github.com/stonetoned/diagrams-as-code.git
 cd dgrac
 ```
 
